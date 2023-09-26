@@ -1,0 +1,2 @@
+nvcc -o out main.cu image.cpp utils/chronoGPU.cu
+nvcc -o outCPU cpuWork.cu image.cpp utils/chronoCPU.cpp
