@@ -1,0 +1,149 @@
+#!/bin/bash -x
+export PATH=/usr/lib/quagga:$PATH
+#   graph: Network Infrastructure Project (L2TPv3 LAB)
+
+#   Create namespaces
+#   router
+ip netns add R1
+ip netns add R2
+ip netns add RA
+ip netns add RB
+
+#   post
+ip netns add P1
+ip netns add P2
+ip netns add P3
+ip netns add P4
+
+#   Create switches
+ovs-vsctl add-br internet
+ovs-vsctl add-br resB
+ovs-vsctl add-br resC
+ovs-vsctl add-br resD
+ovs-vsctl add-br resE
+
+
+#   Config for router A
+ip link add RA-eth0 type veth peer name resC-RA
+ip link set RA-eth0 netns RA
+ovs-vsctl add-port resC resC-RA
+ip link set dev resC-RA up
+
+ip link add RA-eth1 type veth peer name internet-RA
+ip link set RA-eth1 netns RA
+ovs-vsctl add-port internet internet-RA
+ip link set dev internet-RA up
+
+ip netns exec RA ip link set dev lo up
+ip netns exec RA ip link set dev RA-eth0 up
+ip netns exec RA ip link set dev RA-eth1 up
+
+ip netns exec RA ip a add dev RA-eth0 172.16.1.254/24
+ip netns exec RA ip a add dev RA-eth1 10.87.0.1/24
+ip netns exec RA sudo sysctl net.ipv4.conf.all.forwarding=1
+
+ip netns exec RA ip r add 172.16.2.0/24 via 10.87.0.2 dev RA-eth1
+
+#   config for router B
+ip link add RB-eth0 type veth peer name resB-RB
+ip link set RB-eth0 netns RB
+ovs-vsctl add-port resB resB-RB
+ip link set dev resB-RB up
+
+ip link add RB-eth1 type veth peer name internet-RB
+ip link set RB-eth1 netns RB
+ovs-vsctl add-port internet internet-RB
+ip link set dev internet-RB up
+
+ip netns exec RB ip link set dev lo up
+ip netns exec RB ip link set dev RB-eth0 up
+ip netns exec RB ip link set dev RB-eth1 up
+
+ip netns exec RB ip a add dev RB-eth0 172.16.2.254/24
+ip netns exec RB ip a add dev RB-eth1 10.87.0.2/24
+ip netns exec RB sudo sysctl net.ipv4.conf.all.forwarding=1
+
+ip netns exec RB ip r add 172.16.1.0/24 via 10.87.0.1 dev RB-eth1
+
+
+#   config for router 1
+ip link add R1-eth0 type veth peer name resC-R1
+ip link set R1-eth0 netns R1
+ovs-vsctl add-port resC resC-R1
+ip link set dev resC-R1 up
+
+ip link add R1-eth1 type veth peer name resD-R1
+ip link set R1-eth1 netns R1
+ovs-vsctl add-port resD resD-R1
+ip link set dev resD-R1 up
+
+ip netns exec R1 ip link set dev lo up
+ip netns exec R1 ip link set dev R1-eth0 up
+ip netns exec R1 ip link set dev R1-eth1 up
+
+ip netns exec R1 ip a add dev R1-eth0 172.16.1.253/24
+ip netns exec R1 ip r add default via 172.16.1.254 dev R1-eth0
+ip netns exec R1 sudo sysctl net.ipv4.conf.all.forwarding=1
+
+ip netns exec R1 ip r add 172.16.2.0/24 via 172.16.1.254 dev R1-eth0
+
+#   config for router 2
+ip link add R2-eth0 type veth peer name resB-R2
+ip link set R2-eth0 netns R2
+ovs-vsctl add-port resB resB-R2
+ip link set dev resB-R2 up
+
+ip link add R2-eth1 type veth peer name resE-R2
+ip link set R2-eth1 netns R2
+ovs-vsctl add-port resE resE-R2
+ip link set dev resE-R2 up
+
+ip netns exec R2 ip link set dev lo up
+ip netns exec R2 ip link set dev R2-eth0 up
+ip netns exec R2 ip link set dev R2-eth1 up
+
+ip netns exec R2 ip a add dev R2-eth0 172.16.2.253/24
+ip netns exec R2 ip r add default via 172.16.2.254 dev R2-eth0
+ip netns exec R2 sudo sysctl net.ipv4.conf.all.forwarding=1
+
+ip netns exec R2 ip r add 172.16.1.0/24 via 172.16.2.254 dev R2-eth0
+
+
+
+#   config for Post1
+ip link add P1-eth0 type veth peer name resE-P1
+ip link set P1-eth0 netns P1
+ovs-vsctl add-port resE resE-P1
+ip link set dev resE-P1 up
+ip netns exec P1 ip link set dev P1-eth0 up
+ip netns exec P1 ip link set dev lo up
+
+#   config for Post2
+ip link add P2-eth0 type veth peer name resE-P2
+ip link set P2-eth0 netns P2
+ovs-vsctl add-port resE resE-P2
+ip link set dev resE-P2 up
+ip netns exec P2 ip link set dev P2-eth0 up
+ip netns exec P2 ip link set dev lo up
+
+#   config for Post3
+ip link add P3-eth0 type veth peer name resD-P3
+ip link set P3-eth0 netns P3
+ovs-vsctl add-port resD resD-P3
+ip link set dev resD-P3 up
+ip netns exec P3 ip link set dev P3-eth0 up
+ip netns exec P3 ip link set dev lo up
+
+#   config for Post4
+ip link add P4-eth0 type veth peer name resD-P4
+ip link set P4-eth0 netns P4
+ovs-vsctl add-port resD resD-P4
+ip link set dev resD-P4 up
+ip netns exec P4 ip link set dev P4-eth0 up
+ip netns exec P4 ip link set dev lo up
+
+
+ip link set internet up
+
+
+

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# R1
+ip netns exec R1 ip rule add from 192.168.100.0/24 lookup vlan100
+ip netns exec R1 ip rule add from 192.168.200.0/24 lookup vlan200
+ip netns exec R1 ip route add prohibit 192.168.200.0/24 table vlan100
+ip netns exec R1 ip route add prohibit 192.168.100.0/24 table vlan200
+
+# R2
+ip netns exec R2 ip rule add from 192.168.100.0/24 lookup vlan100
+ip netns exec R2 ip rule add from 192.168.200.0/24 lookup vlan200
+ip netns exec R2 ip route add prohibit 192.168.200.0/24 table vlan100
+ip netns exec R2 ip route add prohibit 192.168.100.0/24 table vlan200

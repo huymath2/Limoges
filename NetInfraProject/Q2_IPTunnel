@@ -1,0 +1,48 @@
+#!/bin/bash -x
+
+ip netns exec R1 ip l2tp add tunnel remote 172.16.2.253 local 172.16.1.253 encap ip tunnel_id 3000 peer_tunnel_id 4000
+ip netns exec R1 ip l2tp add session tunnel_id 3000 session_id 1000 peer_session_id 2000
+ip netns exec R1 ip link set l2tpeth0 up
+ip netns exec R1 brctl addbr tunnel
+ip netns exec R1 brctl addif tunnel l2tpeth0
+ip netns exec R1 brctl addif tunnel R1-eth1
+ip netns exec R1 ip link set tunnel up
+ip netns exec R1 ip link add link tunnel name tunnel.100 type vlan id 100
+ip netns exec R1 ip link set tunnel.100 up
+ip netns exec R1 ip link add link tunnel name tunnel.200 type vlan id 200
+ip netns exec R1 ip link set tunnel.200 up
+ip netns exec R1 ip addr add 192.168.100.254/24 dev tunnel.100
+ip netns exec R1 ip addr add 192.168.200.254/24 dev tunnel.200
+
+ip netns exec R2 ip l2tp add tunnel remote 172.16.1.253 local 172.16.2.253 encap ip tunnel_id 4000 peer_tunnel_id 3000
+ip netns exec R2 ip l2tp add session tunnel_id 4000 session_id 2000 peer_session_id 1000
+ip netns exec R2 ip link set l2tpeth0 up
+ip netns exec R2 brctl addbr tunnel
+ip netns exec R2 brctl addif tunnel l2tpeth0
+ip netns exec R2 brctl addif tunnel R2-eth1
+ip netns exec R2 ip link set tunnel up
+ip netns exec R2 ip link add link tunnel name tunnel.100 type vlan id 100
+ip netns exec R2 ip link set tunnel.100 up
+ip netns exec R2 ip link add link tunnel name tunnel.200 type vlan id 200
+ip netns exec R2 ip link set tunnel.200 up
+ip netns exec R2 ip addr add 192.168.100.253/24 dev tunnel.100
+ip netns exec R2 ip addr add 192.168.200.253/24 dev tunnel.200
+
+ip netns exec P1 ip link add link P1-eth0 name P1-eth0.100 type vlan id 100
+ip netns exec P1 ip link set P1-eth0.100 up
+ip netns exec P2 ip link add link P2-eth0 name P2-eth0.200 type vlan id 200
+ip netns exec P2 ip link set P2-eth0.200 up
+ip netns exec P3 ip link add link P3-eth0 name P3-eth0.100 type vlan id 100
+ip netns exec P3 ip link set P3-eth0.100 up
+ip netns exec P4 ip link add link P4-eth0 name P4-eth0.200 type vlan id 200
+ip netns exec P4 ip link set P4-eth0.200 up
+
+
+#   configure virtual computers using DHCP
+sudo ip netns exec R1 dnsmasq -d -z -i tunnel.100 --except-interface=lo -F 192.168.100.0,192.168.100.180,255.255.255.0 &
+sudo ip netns exec R1 dnsmasq -d -z -i tunnel.200 --except-interface=lo -F 192.168.200.0,192.168.200.180,255.255.255.0 &
+#   connect to get IP address
+sudo ip netns exec P1 dhclient P1-eth0.100 &
+sudo ip netns exec P3 dhclient P3-eth0.100 &
+sudo ip netns exec P4 dhclient P4-eth0.200 &
+sudo ip netns exec P2 dhclient P2-eth0.200 &

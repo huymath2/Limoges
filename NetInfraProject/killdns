@@ -1,0 +1,5 @@
+#!/bin/bash
+for l in $(pgrep dnsmasq)
+do
+	kill -15 $l
+done;

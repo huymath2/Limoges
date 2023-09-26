@@ -1,0 +1,132 @@
+digraph G { 
+    label = "Network Infrastructure Project (L2TPv3 LAB)";
+    labelloc = top;
+ 
+    node [shape=record];
+    edge [dir=both];
+subgraph cluster_0 {
+		label = R1;
+	
+        "R1-eth0" [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="lightblue"><b>R1-eth0</b></td></tr>
+                <tr><td align="left">IP: 172.16.1.253/24</td></tr>
+            </table>
+        >];
+	}
+subgraph cluster_1 {
+		label = R2;
+	
+        "R2-eth0" [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="lightblue"><b>R2-eth0</b></td></tr>
+                <tr><td align="left">IP: 172.16.2.253/24</td></tr>
+            </table>
+        >];
+	}
+subgraph cluster_2 {
+		label = RA;
+	
+        "RA-eth0" [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="lightblue"><b>RA-eth0</b></td></tr>
+                <tr><td align="left">IP: 172.16.1.254/24</td></tr>
+            </table>
+        >];
+        "RA-eth1" [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="lightblue"><b>RA-eth1</b></td></tr>
+                <tr><td align="left">IP: 10.87.0.1/24</td></tr>
+            </table>
+        >];
+	}
+subgraph cluster_3 {
+		label = RB;
+	
+        "RB-eth0" [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="lightblue"><b>RB-eth0</b></td></tr>
+                <tr><td align="left">IP: 172.16.2.254/24</td></tr>
+            </table>
+        >];
+        "RB-eth1" [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="lightblue"><b>RB-eth1</b></td></tr>
+                <tr><td align="left">IP: 10.87.0.2/24</td></tr>
+            </table>
+        >];
+	}
+subgraph cluster_4 {
+		label = P1;
+	
+	}
+subgraph cluster_5 {
+		label = P2;
+	
+	}
+subgraph cluster_6 {
+		label = P3;
+	
+	}
+subgraph cluster_7 {
+		label = P4;
+	
+	}
+subgraph cluster_8 {
+		label = internet;
+	
+        "internet" [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="orange"><b>internet</b></td></tr>
+            </table>
+        >];
+	}
+subgraph cluster_9 {
+		label = resB;
+	
+        "resB" [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="orange"><b>resB</b></td></tr>
+            </table>
+        >];
+	}
+subgraph cluster_10 {
+		label = resC;
+	
+        "resC" [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="orange"><b>resC</b></td></tr>
+            </table>
+        >];
+	}
+subgraph cluster_11 {
+		label = resD;
+	
+        "resD" [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="orange"><b>resD</b></td></tr>
+            </table>
+        >];
+	}
+subgraph cluster_12 {
+		label = resE;
+	
+        "resE" [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="orange"><b>resE</b></td></tr>
+            </table>
+        >];
+	}
+ "resC"->"RA-eth0"; 
+ "internet"->"RA-eth1"; 
+ "resB"->"RB-eth0"; 
+ "internet"->"RB-eth1"; 
+ "resC"->"R1-eth0"; 
+ "resD"->"R1-eth1"; 
+ "resB"->"R2-eth0"; 
+ "resE"->"R2-eth1"; 
+ "resE"->"P1-eth0"; 
+ "resE"->"P2-eth0"; 
+ "resD"->"P3-eth0"; 
+ "resD"->"P4-eth0"; 
+}

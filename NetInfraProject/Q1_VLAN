@@ -1,0 +1,35 @@
+#   config VLAN
+ip netns exec R1 ip link add link R1-eth1 name R1-eth1.100 type vlan id 100
+ip netns exec R1 ip link set dev R1-eth1.100 up
+ip netns exec R1 ip addr add 192.168.100.254/24 dev R1-eth1.100
+
+ip netns exec R1 ip link add link R1-eth1 name R1-eth1.200 type vlan id 200
+ip netns exec R1 ip link set dev R1-eth1.200 up
+ip netns exec R1 ip addr add 192.168.200.254/24 dev R1-eth1.200
+
+
+ip netns exec R2 ip link add link R2-eth1 name R2-eth1.100 type vlan id 100
+ip netns exec R2 ip link set dev R2-eth1.100 up
+ip netns exec R2 ip addr add 192.168.100.253/24 dev R2-eth1.100
+
+ip netns exec R2 ip link add link R2-eth1 name R2-eth1.200 type vlan id 200
+ip netns exec R2 ip addr add 192.168.200.253/24 dev R2-eth1.200
+ip netns exec R2 ip link set dev R2-eth1.200 up
+
+ip netns exec P1 ip link add link P1-eth0 name P1-eth0.100 type vlan id 100
+ip netns exec P1 ip link set P1-eth0.100 up
+
+ip netns exec P2 ip link add link P2-eth0 name P2-eth0.200 type vlan id 200
+ip netns exec P2 ip link set P2-eth0.200 up
+
+ip netns exec P3 ip link add link P3-eth0 name P3-eth0.100 type vlan id 100
+ip netns exec P3 ip link set P3-eth0.100 up
+
+ip netns exec P4 ip link add link P4-eth0 name P4-eth0.200 type vlan id 200
+ip netns exec P4 ip link set P4-eth0.200 up
+
+#   configure virtual computers using DHCP
+ip netns exec R1 dnsmasq -d -z -i R1-eth1.100 --except-interface=lo -F 192.168.100.0,192.168.100.80,255.255.255.0 &
+ip netns exec R1 dnsmasq -d -z -i R1-eth1.200 --except-interface=lo -F 192.168.200.0,192.168.200.80,255.255.255.0 &
+ip netns exec P3 dhclient P3-eth0.100 &
+ip netns exec P4 dhclient P4-eth0.200 &

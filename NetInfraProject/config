@@ -1,0 +1,66 @@
+
+export PATH=/usr/lib/quagga:$PATH
+mkdir -p /run/quagga
+mkdir -p /etc/netns/poste1
+mkdir -p /etc/netns/poste2
+mkdir -p /etc/netns/poste3
+mkdir -p /etc/netns/poste4
+mkdir -p /etc/netns/rout1/quagga
+mkdir -p /etc/netns/rout2/quagga
+mkdir -p /etc/netns/routA/quagga
+mkdir -p /etc/netns/routB/quagga
+
+cd /etc/netns/rout1/quagga/
+touch daemons
+echo "zebra=yes
+bgpd=no
+ospfd=yes
+ospf6d=no
+ripd=yes
+ripngd=no
+isisd=no" > daemons
+
+cd /etc/netns/rout2/quagga/
+touch daemons
+echo "zebra=yes
+bgpd=no
+ospfd=yes
+ospf6d=no
+ripd=yes
+ripngd=no
+isisd=no" > daemons
+
+cd /etc/netns/routA/quagga/
+touch daemons
+echo "zebra=yes
+bgpd=no
+ospfd=yes
+ospf6d=no
+ripd=yes
+ripngd=no
+isisd=no" > daemons
+
+cd /etc/netns/routB/quagga/
+touch daemons
+echo "zebra=yes
+bgpd=no
+ospfd=yes
+ospf6d=no
+ripd=yes
+ripngd=no
+isisd=no" > daemons
+
+cp /usr/share/doc/quagga-core/examples/zebra.conf.sample /etc/netns/rout1/quagga/zebra.conf
+cp /usr/share/doc/quagga-core/examples/zebra.conf.sample /etc/netns/rout2/quagga/zebra.conf
+cp /usr/share/doc/quagga-core/examples/zebra.conf.sample /etc/netns/routA/quagga/zebra.conf
+cp /usr/share/doc/quagga-core/examples/zebra.conf.sample /etc/netns/routB/quagga/zebra.conf
+
+cp /usr/share/doc/quagga-core/examples/ripd.conf.sample /etc/netns/rout1/quagga/ripd.conf
+cp /usr/share/doc/quagga-core/examples/ripd.conf.sample /etc/netns/rout2/quagga/ripd.conf
+cp /usr/share/doc/quagga-core/examples/ripd.conf.sample /etc/netns/routA/quagga/ripd.conf
+cp /usr/share/doc/quagga-core/examples/ripd.conf.sample /etc/netns/routB/quagga/ripd.conf
+
+chown -R quagga:quagga /etc/netns/rout1/quagga
+chown -R quagga:quagga /etc/netns/rout2/quagga
+chown -R quagga:quagga /etc/netns/routA/quagga
+chown -R quagga:quagga /etc/netns/routB/quagga
